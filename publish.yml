@@ -1,0 +1,220 @@
+# === pyproject.toml ===
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ip-lookup"
+version = "1.0.0"
+description = "Module Python simple pour afficher les informations d'une adresse IP"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [{name = "Cristal-Dev", email = "your-email@example.com"}]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Internet",
+    "Topic :: System :: Networking",
+    "Topic :: Utilities",
+]
+keywords = ["ip", "geolocation", "network", "api"]
+requires-python = ">=3.7"
+dependencies = [
+    "requests>=2.25.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Cristal-Dev/IP-Lookup"
+Repository = "https://github.com/Cristal-Dev/IP-Lookup"
+Issues = "https://github.com/Cristal-Dev/IP-Lookup/issues"
+
+[project.scripts]
+ip-lookup = "ip_lookup.main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ip_lookup*"]
+
+# === .github/workflows/publish.yml ===
+name: Publish to PyPI
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write  # Required for trusted publishing
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+    
+    - name: Install build dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine
+    
+    - name: Build package
+      run: |
+        python -m build
+    
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+
+# === ip_lookup/__init__.py ===
+"""
+IP Lookup - Module Python simple pour afficher les informations d'une adresse IP
+"""
+
+from .ip_info import InfoIP
+
+__version__ = "1.0.0"
+__author__ = "Cristal-Dev"
+__email__ = "your-email@example.com"
+
+__all__ = ["InfoIP"]
+
+# === ip_lookup/main.py ===
+#!/usr/bin/env python3
+"""
+Point d'entrée principal pour la commande ip-lookup
+"""
+
+import sys
+from .ip_info import InfoIP
+
+def main():
+    """Fonction principale pour utilisation en ligne de commande"""
+    info_ip = InfoIP()
+    
+    if len(sys.argv) > 1:
+        ip = sys.argv[1]
+        print(f"Analyse de l'IP: {ip}")
+        info_ip.afficher_info(ip)
+    else:
+        print("Analyse de votre IP publique:")
+        info_ip.afficher_info()
+
+if __name__ == "__main__":
+    main()
+
+# === README.md ===
+# IP Lookup
+
+Un module Python simple et efficace pour afficher les informations d'une adresse IP.
+
+## Installation
+
+```bash
+pip install ip-lookup
+```
+
+## Utilisation
+
+### En tant que module Python
+
+```python
+from ip_lookup import InfoIP
+
+# Créer une instance
+ip_analyzer = InfoIP()
+
+# Analyser votre IP publique
+ip_analyzer.afficher_info()
+
+# Analyser une IP spécifique
+ip_analyzer.afficher_info("8.8.8.8")
+
+# Récupérer les données sans affichage
+data = ip_analyzer.obtenir_info("1.1.1.1")
+print(f"Pays: {data['country']}, Ville: {data['city']}")
+```
+
+### En ligne de commande
+
+```bash
+# Analyser votre IP publique
+ip-lookup
+
+# Analyser une IP spécifique
+ip-lookup 8.8.8.8
+```
+
+## Fonctionnalités
+
+- 🌐 Affichage des informations IP (pays, ville, FAI, etc.)
+- 📍 Coordonnées GPS et fuseau horaire
+- 🔍 Détection du type de connexion (mobile, proxy, fixe)
+- ⚡ API rapide et gratuite (ip-api.com)
+- 🎨 Affichage coloré avec émojis
+- 🛡️ Gestion d'erreurs intégrée
+
+## Informations affichées
+
+- Adresse IP
+- Fournisseur d'accès Internet (FAI)
+- Organisation
+- Pays et code pays
+- Région et ville
+- Code postal
+- Fuseau horaire
+- Coordonnées GPS (latitude, longitude)
+- Type de connexion
+
+## Dépendances
+
+- `requests` >= 2.25.0
+
+## Licence
+
+MIT License
+
+## Auteur
+
+Cristal-Dev
+
+## Support
+
+Si vous rencontrez des problèmes, n'hésitez pas à ouvrir une issue sur [GitHub](https://github.com/Cristal-Dev/IP-Lookup/issues).
+
+# === MANIFEST.in ===
+include README.md
+include LICENSE
+recursive-include ip_lookup *.py
+
+# === LICENSE ===
+MIT License
+
+Copyright (c) 2025 Cristal-Dev
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
